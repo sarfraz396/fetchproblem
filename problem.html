@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Filter</title>
+</head>
+
+<body>
+
+    <select id="category">
+        <option value="all">All Products</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Accessories">Accessories</option>
+        <option value="Fashion">Fashion</option>
+    </select>
+
+    <div id="products"></div>
+
+    <script>
+
+        const categorySelect = document.getElementById("category");
+        const showProduct = document.getElementById("products");
+
+        let products = [];
+
+
+        // Fetch products
+        async function loadProducts() {
+
+            try {
+
+                const response = await fetch("product.json");
+
+                if (!response.ok) {
+                    throw new Error("Products could not be loaded");
+                }
+
+                products = await response.json();
+
+                displayProduct(products);
+
+            } catch (error) {
+
+                showProduct.innerText = error.message;
+
+            }
+        }
+
+
+        // Display products
+        function displayProduct(myProduct) {
+
+            showProduct.innerHTML = "";
+
+            if (myProduct.length === 0) {
+
+                showProduct.innerText = "Product not found";
+                return;
+
+            }
+
+            myProduct.forEach((product) => {
+
+                const card = document.createElement("div");
+
+                const name = document.createElement("h2");
+                name.textContent = product.name;
+
+                const price = document.createElement("p");
+                price.textContent = `Rs. ${product.price}`;
+
+                const category = document.createElement("p");
+                category.textContent = `Category: ${product.category}`;
+
+                const stock = document.createElement("p");
+
+                if (product.stock === 0) {
+                    stock.textContent = "Out of Stock";
+                } else {
+                    stock.textContent = `Stock: ${product.stock}`;
+                }
+
+                card.append(name, price, category, stock);
+
+                showProduct.append(card);
+
+            });
+        }
+
+
+        // Category filter
+        categorySelect.addEventListener("change", (event) => {
+
+            const selectedCategory = event.target.value;
+
+            if (selectedCategory === "all") {
+
+                displayProduct(products);
+
+            } else {
+
+                const filteredProducts = products.filter((currentProduct) => {
+
+                    return currentProduct.category === selectedCategory;
+
+                });
+
+                displayProduct(filteredProducts);
+
+            }
+
+        });
+
+
+        // Load products
+        loadProducts();
+
+    </script>
+
+</body>
+</html>
